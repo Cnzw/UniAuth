@@ -1,0 +1,43 @@
+
+
+#         Powered by TabooLib 6.0         #
+
+
+metrics: true
+api:
+  path: "ua"
+  key: "123456"
+login:
+  server: ""
+  # 0 = 不使用Authme，强制使用扫码注册和登录
+  # 1 = 可用Authme注册登录，也可使用扫码注册和登录
+  mode: 0
+  # like authme
+  command-whitelist: []
+  # regex
+  allowed-nickname: ""
+  movement-range: 0
+  location: "" #TODO
+  chat: false
+commands:
+  first-join: []
+  join: []
+  prompt: []
+  scan: []
+  confirm: []
+  cancel: []
+modules:
+  login: true
+  banlist: false
+  whitelist: false
+  economy: false
+  compat:
+    luckperms: false
+    litesignin: false
+messages:
+  first-join: ""
+  join: ""
+  prompt: ""
+  scan: ""
+  confirm: ""
+  cancel: ""
