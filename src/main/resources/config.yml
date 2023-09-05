@@ -5,7 +5,7 @@
 
 metrics: true
 api:
-  path: "ua"
+  path: "uniauth"
   key: "123456"
 login:
   server: ""
