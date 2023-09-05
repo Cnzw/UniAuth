@@ -8,17 +8,17 @@ api:
   path: "uniauth"
   key: "123456"
 login:
+  timeout: 120
   server: ""
   # 0 = 不使用Authme，强制使用扫码注册和登录
   # 1 = 可用Authme注册登录，也可使用扫码注册和登录
   mode: 0
   # like authme
   command-whitelist: []
-  # regex
-  allowed-nickname: ""
+  player-name-regex: ""
   movement-range: 0
-  location: "" #TODO
   chat: false
+  blind: false
 commands:
   first-join: []
   join: []
@@ -41,3 +41,5 @@ messages:
   scan: ""
   confirm: ""
   cancel: ""
+  invalid-name: ""
+  welcome: ""

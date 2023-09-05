@@ -1,14 +1,19 @@
 package cn.unimc.mcpl.uniauth.listener
 
 import cn.unimc.mcpl.uniauth.AidUtils
+import cn.unimc.mcpl.uniauth.UniAuth
+import cn.unimc.mcpl.uniauth.Utils
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
+import org.bukkit.Bukkit
 import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.player.*
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.info
 import taboolib.module.nms.NMSMap
@@ -20,17 +25,56 @@ object PlayerEvent {
     fun onPlayerQuit(ev: PlayerQuitEvent) {
         AidUtils.delAid(ev.player.name)
     }
-    @SubscribeEvent //TODO
+
+    @SubscribeEvent
+    fun onAsyncPlayerPreLogin(ev: AsyncPlayerPreLoginEvent) {
+        if (ev.loginResult != AsyncPlayerPreLoginEvent.Result.ALLOWED) return
+
+        // TODO bypass
+
+        if (Utils.compilePattern(UniAuth.config.getString("login.player-name-regex")!!).matcher(ev.name).matches()) {
+            ev.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "") // TODO Lang
+        }
+    }
+
+    @SubscribeEvent
+    fun onPlayerLogin(ev: PlayerLoginEvent) {
+        // TODO bypass
+
+        if (Bukkit.getPlayerExact(ev.player.name) != null) {
+            ev.disallow(PlayerLoginEvent.Result.KICK_FULL, "") // TODO Lang
+        }
+    }
+
+    @SubscribeEvent
     fun onPlayerJoin(ev: PlayerJoinEvent) {
+        // TODO bypass
+
+        // TODO Session
+
+        // TODO 登录超时处理
+
+        // TODO cmd
+
+        if (UniAuth.config.getBoolean("login.blind", false)) {
+            ev.player.addPotionEffect(
+                PotionEffect(
+                    PotionEffectType.BLINDNESS,
+                    UniAuth.config.getInt("login.timeout", 120) * 20,
+                    2,
+                )
+            )
+        }
+
         val aid = AidUtils.addAid(ev.player.name)
-        info("玩家 ${ev.player.name} 的 aid 是 $aid")
+        info("玩家 ${ev.player.name} 的 aid 是 $aid") // TODO debug
 
         val hints = mapOf<EncodeHintType, Any>(
             EncodeHintType.CHARACTER_SET to "UTF-8",
             EncodeHintType.MARGIN to 0
         )
         val bitMatrix = MultiFormatWriter().encode(
-            "https://www.bing.com/search?q=$aid",
+            "https://www.bing.com/search?q=$aid", //TODO 等小程序
             BarcodeFormat.QR_CODE, 128, 128, hints
         )
         val width = bitMatrix.width
@@ -38,10 +82,12 @@ object PlayerEvent {
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         for (x in 0 until width) {
             for (y in 0 until height) {
-                image.setRGB(x, y, if(bitMatrix.get(x, y)) 0 else 16777215)
+                image.setRGB(x, y, if (bitMatrix.get(x, y)) 0 else 16777215)
             }
         }
         ev.player.sendMap(image, NMSMap.Hand.OFF)
+
+        // TODO lang
     }
 
     @SubscribeEvent //TODO

@@ -2,6 +2,8 @@ package cn.unimc.mcpl.uniauth
 
 import io.netty.handler.codec.http.*
 import taboolib.common.platform.function.pluginVersion
+import taboolib.common.platform.function.warning
+import java.util.regex.Pattern
 
 object Utils {
     fun getRandomString(length: Int) : String {
@@ -27,11 +29,21 @@ object Utils {
             .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
         return response
     }
-    fun build400Resp(): DefaultHttpResponse{
+
+    fun build400Resp(): DefaultHttpResponse {
         val response = DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST)
         response.headers()
             .set("x-uniauth-version", pluginVersion)
             .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
         return response
+    }
+
+    fun compilePattern(pattern: String): Pattern {
+        return try {
+            Pattern.compile(pattern)
+        } catch (e: Exception) {
+            warning("编译表达式 '$pattern' 失败，允许所有字符")
+            Pattern.compile(".*?")
+        }
     }
 }
