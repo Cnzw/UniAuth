@@ -22,7 +22,7 @@ object PingReq: UniporterHttpHandler {
             return
         }
 
-        val opt: String = "Pong!"
+        val opt = "Pong!"
         val response: FullHttpResponse = DefaultFullHttpResponse(
             HttpVersion.HTTP_1_1,
             HttpResponseStatus.OK,

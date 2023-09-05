@@ -29,17 +29,16 @@ object UniAuth : Plugin() {
 
         if (config.getBoolean("metrics", true)) Metrics(19486, pluginVersion, runningPlatform)
 
-        if (config.getString("api.path") == "uniauth" || config.getString("api.path") == "") {
+        if (config.getString("api.path")!! == "uniauth") {
             config.set("api.path", Utils.getRandomString(6))
             warning("检测到 api.path 是默认路径，已生成随机路径")
         }
-        if (config.getString("api.key") == "123456" || config.getString("api.path") == "") {
+        if (config.getString("api.key")!! == "123456") {
             config.set("api.key", Utils.getRandomString(12))
             warning("检测到 api.key 是默认密钥，已生成随机密钥")
         }
         
         val path = config.getString("api.path")!!
-        // TODO 输出api地址
         Uniporter.registerHandler("$path/v1/ping", cn.unimc.mcpl.uniauth.uniporter.PingReq, true)
         Uniporter.registerHandler("$path/v1/server", cn.unimc.mcpl.uniauth.uniporter.ServerReq, true)
         Uniporter.registerHandler("$path/v1/players", cn.unimc.mcpl.uniauth.uniporter.PlayersReq, true)
