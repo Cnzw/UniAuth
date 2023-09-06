@@ -1,7 +1,6 @@
 package cn.unimc.mcpl.uniauth.listener
 
 import cn.unimc.mcpl.uniauth.AidUtils
-import cn.unimc.mcpl.uniauth.UniAuth
 import cn.unimc.mcpl.uniauth.Utils
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -30,25 +29,21 @@ object PlayerEvent {
     fun onAsyncPlayerPreLogin(ev: AsyncPlayerPreLoginEvent) {
         if (ev.loginResult != AsyncPlayerPreLoginEvent.Result.ALLOWED) return
 
-        // TODO bypass
-
-        if (Utils.compilePattern(UniAuth.config.getString("login.player-name-regex")!!).matcher(ev.name).matches()) {
+        if (Utils.compilePattern(Utils.config.getString("login.player-name-regex")!!).matcher(ev.name).matches()) {
             ev.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "") // TODO Lang
         }
     }
-
     @SubscribeEvent
     fun onPlayerLogin(ev: PlayerLoginEvent) {
-        // TODO bypass
+        if (ev.player.hasPermission("uniauth.login.bypass")) return
 
         if (Bukkit.getPlayerExact(ev.player.name) != null) {
             ev.disallow(PlayerLoginEvent.Result.KICK_FULL, "") // TODO Lang
         }
     }
-
     @SubscribeEvent
     fun onPlayerJoin(ev: PlayerJoinEvent) {
-        // TODO bypass
+        if (ev.player.hasPermission("uniauth.login.bypass")) return
 
         // TODO Session
 
@@ -56,11 +51,11 @@ object PlayerEvent {
 
         // TODO cmd
 
-        if (UniAuth.config.getBoolean("login.blind", false)) {
+        if (Utils.config.getBoolean("login.blind")) {
             ev.player.addPotionEffect(
                 PotionEffect(
                     PotionEffectType.BLINDNESS,
-                    UniAuth.config.getInt("login.timeout", 120) * 20,
+                    Utils.config.getInt("login.timeout") * 20,
                     2,
                 )
             )
@@ -98,7 +93,7 @@ object PlayerEvent {
     }
     @SubscribeEvent //TODO 配置文件
     fun onPlayerChat(ev: AsyncPlayerChatEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
+        if (!Utils.config.getBoolean("login.chat") && AidUtils.hasName(ev.player.name)) {
             ev.isCancelled
         }
     }
