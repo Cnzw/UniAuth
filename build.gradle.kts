@@ -24,12 +24,12 @@ taboolib {
             name("Cnzw")
         }
         links{
-            name("homepage").url("https://unimc.com/uniauth")
+            name("homepage").url("https://ua.unimc.com")
         }
         dependencies {
             name("Uniporter")
             name("PlaceholderAPI").optional(true)
-            name("Vault").optional(true)
+            name("Vault")
         }
     }
 }
@@ -47,9 +47,10 @@ dependencies {
     compileOnly("ink.ptms.core:v11902:11902-minimize:mapped")
     compileOnly("ink.ptms.core:v11902:11902-minimize:universal")
     compileOnly("com.github.Apisium:Uniporter:1.3.4-SNAPSHOT")
-    compileOnly("io.netty:netty-all:4.1.85.Final")
+    compileOnly("io.netty:netty-all:4.1.86.Final")
     compileOnly("me.clip:placeholderapi:2.11.3")
     compileOnly("fr.xephi:authme:5.6.0-20230802.072321-162")
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     taboo("com.alibaba.fastjson2:fastjson2-kotlin:2.0.39-SNAPSHOT")
     taboo("com.google.zxing:javase:3.5.2")
     compileOnly(kotlin("stdlib"))
