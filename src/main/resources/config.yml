@@ -3,6 +3,7 @@
 #         Powered by TabooLib 6.0         #
 
 
+debug: false
 metrics: true
 api:
   path: "uniauth"
@@ -10,15 +11,15 @@ api:
 login:
   timeout: 120
   server: ""
-  # 0 = 不使用Authme，强制使用扫码注册和登录
-  # 1 = 可用Authme注册登录，也可使用扫码注册和登录
-  mode: 0
-  # like authme
-  command-whitelist: []
+  #  # 0 = 不使用Authme，强制使用扫码注册和登录
+  #  # 1 = 可用Authme注册登录，也可使用扫码注册和登录
+  #  mode: 0
+  command-whitelist: [ ]
+  # - ''
   player-name-regex: ""
   movement-range: 0
   chat: false
-  blind: false
+  blind: false # 记得恢复
 commands:
   first-join: []
   join: []
@@ -26,20 +27,3 @@ commands:
   scan: []
   confirm: []
   cancel: []
-modules:
-  login: true
-  banlist: false
-  whitelist: false
-  economy: false
-  compat:
-    luckperms: false
-    litesignin: false
-messages:
-  first-join: ""
-  join: ""
-  prompt: ""
-  scan: ""
-  confirm: ""
-  cancel: ""
-  invalid-name: ""
-  welcome: ""

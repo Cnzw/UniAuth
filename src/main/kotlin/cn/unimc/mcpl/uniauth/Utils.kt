@@ -1,21 +1,32 @@
 package cn.unimc.mcpl.uniauth
 
 import io.netty.handler.codec.http.*
+import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
 import taboolib.common.platform.function.warning
+import taboolib.module.configuration.Config
+import taboolib.module.configuration.Configuration
 import java.util.regex.Pattern
 
 object Utils {
-    fun getRandomString(length: Int) : String {
+    @Config("config.yml")
+    lateinit var config: Configuration
+    fun debugLog(msg: String) {
+        if (this.config.getBoolean("debug")) info(msg)
+    }
+
+    fun getRandomString(length: Int): String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
         return (1..length)
             .map { allowedChars.random() }
             .joinToString("")
     }
+
     fun verifyReqHandler(headers: HttpHeaders?): Boolean {
-        return (headers != null && headers.get("Authorization") == UniAuth.config.getString("api.key", "123456"))
+        return (headers != null && headers.get("Authorization") == this.config.getString("api.key")!!)
     }
-    fun build401Resp(): DefaultHttpResponse{
+
+    fun build401Resp(): DefaultHttpResponse {
         val response = DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED)
         response.headers()
             .set("x-uniauth-version", pluginVersion)
