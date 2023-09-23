@@ -9,17 +9,15 @@ api:
   path: "uniauth"
   key: "123456"
 login:
-  timeout: 120
+  timeout: 120 # 秒
+  session: 120 # 秒
+  message-interval: 5 # 秒
   server: ""
-  #  # 0 = 不使用Authme，强制使用扫码注册和登录
-  #  # 1 = 可用Authme注册登录，也可使用扫码注册和登录
-  #  mode: 0
   command-whitelist: [ ]
-  # - ''
-  player-name-regex: ""
-  movement-range: 0
+  # - '/spawn'
+  player-name-regex: "[a-zA-Z0-9_]*"
   chat: false
-  blind: false # 记得恢复
+  blind: true
 commands:
   first-join: []
   join: []

@@ -1,6 +1,7 @@
 package cn.unimc.mcpl.uniauth.listener
 
-import cn.unimc.mcpl.uniauth.AidUtils
+import cn.unimc.mcpl.uniauth.AuthCache
+import cn.unimc.mcpl.uniauth.AuthStatus
 import cn.unimc.mcpl.uniauth.Utils
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -13,8 +14,8 @@ import org.bukkit.event.inventory.InventoryOpenEvent
 import org.bukkit.event.player.*
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
+import taboolib.common.platform.event.EventPriority
 import taboolib.common.platform.event.SubscribeEvent
-import taboolib.common.platform.function.info
 import taboolib.module.nms.NMSMap
 import taboolib.module.nms.sendMap
 import java.awt.image.BufferedImage
@@ -22,7 +23,13 @@ import java.awt.image.BufferedImage
 object PlayerEvent {
     @SubscribeEvent
     fun onPlayerQuit(ev: PlayerQuitEvent) {
-        AidUtils.delAid(ev.player.name)
+        if (AuthCache.getStatus(ev.player.name) == AuthStatus.FAIL) return
+        if (!AuthCache.isAuth(ev.player.name)) {
+            ev.player.removePotionEffect(PotionEffectType.BLINDNESS)
+            AuthCache.setStatus(ev.player.name, AuthStatus.FAIL)
+        } else {
+            AuthCache.setStatus(ev.player.name, AuthStatus.OFFLINE)
+        }
     }
 
     @SubscribeEvent
@@ -37,7 +44,7 @@ object PlayerEvent {
     fun onPlayerLogin(ev: PlayerLoginEvent) {
         if (ev.player.hasPermission("uniauth.login.bypass")) return
 
-        if (Bukkit.getPlayerExact(ev.player.name) != null) {
+        if (Bukkit.getPlayerExact(ev.player.name) != null) { // 已有玩家在线
             ev.disallow(PlayerLoginEvent.Result.KICK_FULL, "") // TODO Lang
         }
     }
@@ -45,7 +52,10 @@ object PlayerEvent {
     fun onPlayerJoin(ev: PlayerJoinEvent) {
         if (ev.player.hasPermission("uniauth.login.bypass")) return
 
-        // TODO Session
+        if (AuthCache.checkSession(ev.player.name)) {
+            AuthCache.setStatus(ev.player.name, AuthStatus.ONLINE)
+            return
+        }
 
         // TODO 登录超时处理
 
@@ -61,8 +71,8 @@ object PlayerEvent {
             )
         }
 
-        val aid = AidUtils.addAid(ev.player.name)
-        info("玩家 ${ev.player.name} 的 aid 是 $aid") // TODO debug
+        val aid = AuthCache.create(ev.player)
+        Utils.debugLog("玩家 ${ev.player.name} 的 aid 是 $aid")
 
         val hints = mapOf<EncodeHintType, Any>(
             EncodeHintType.CHARACTER_SET to "UTF-8",
@@ -75,68 +85,69 @@ object PlayerEvent {
         val width = bitMatrix.width
         val height = bitMatrix.height
         val image = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        for (x in 0 until width) {
+        for (x in 0 until width) { // 拿到了二维码坐标，自行填充像素
             for (y in 0 until height) {
                 image.setRGB(x, y, if (bitMatrix.get(x, y)) 0 else 16777215)
             }
         }
-        ev.player.sendMap(image, NMSMap.Hand.OFF)
+        ev.player.sendMap(image, NMSMap.Hand.OFF) // TODO 背包保护
 
         // TODO lang
     }
 
-    @SubscribeEvent //TODO
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onPlayerMove(ev: PlayerMoveEvent) {
+        if (!AuthCache.isAuth(ev.player.name)) ev.isCancelled
+    }
+
+    @SubscribeEvent
     fun onPlayerCommandPreprocess(ev: PlayerCommandPreprocessEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
+        if (!AuthCache.isAuth(ev.player.name)
+            && !Utils.config.getStringList("login.command-whitelist")
+                .contains(ev.message.split(" ")[0].lowercase())
+        ) {
             ev.isCancelled
         }
     }
-    @SubscribeEvent //TODO 配置文件
+
+    @SubscribeEvent
     fun onPlayerChat(ev: AsyncPlayerChatEvent) {
-        if (!Utils.config.getBoolean("login.chat") && AidUtils.hasName(ev.player.name)) {
+        if (!Utils.config.getBoolean("login.chat") && !AuthCache.isAuth(ev.player.name)) {
             ev.isCancelled
         }
     }
     @SubscribeEvent
     fun onPlayerInteract(ev: PlayerInteractEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.player.name)) ev.isCancelled
     }
     @SubscribeEvent
     fun onInventoryOpen(ev: InventoryOpenEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.player.name)) ev.isCancelled
     }
     @SubscribeEvent
     fun onInventoryClick(ev: InventoryClickEvent) {
-        if (AidUtils.hasName(ev.whoClicked.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.whoClicked.name)) ev.isCancelled
     }
     @SubscribeEvent
     fun onEntityDamageByEntity(ev: EntityDamageByEntityEvent) {
-        if (AidUtils.hasName(ev.damager.name) || AidUtils.hasName(ev.entity.name)) {
+        if (!AuthCache.isAuth(ev.damager.name) || !AuthCache.isAuth(ev.entity.name)) {
             ev.isCancelled
         }
     }
+
     @SubscribeEvent
     fun onPlayerTeleport(ev: PlayerTeleportEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.player.name)) ev.isCancelled
     }
+
     @SubscribeEvent
     fun onPlayerDropItem(ev: PlayerDropItemEvent) {
-        if (AidUtils.hasName(ev.player.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.player.name)) ev.isCancelled
     }
+
     @SubscribeEvent
     fun onEntityPickupItem(ev: EntityPickupItemEvent) {
-        if (AidUtils.hasName(ev.entity.name)) {
-            ev.isCancelled
-        }
+        if (!AuthCache.isAuth(ev.entity.name)) ev.isCancelled
     }
+    // TODO 看看authme有没有漏的地方
 }
