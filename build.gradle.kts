@@ -29,7 +29,7 @@ taboolib {
         dependencies {
             name("Uniporter")
             name("PlaceholderAPI").optional(true)
-            name("Vault")
+//            name("Vault")
         }
     }
 }
