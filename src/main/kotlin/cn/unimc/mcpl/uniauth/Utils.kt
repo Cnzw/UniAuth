@@ -11,6 +11,7 @@ import java.util.regex.Pattern
 object Utils {
     @Config("config.yml")
     lateinit var config: Configuration
+
     fun debugLog(msg: String) {
         if (this.config.getBoolean("debug")) info(msg)
     }
@@ -21,6 +22,13 @@ object Utils {
             .map { allowedChars.random() }
             .joinToString("")
     }
+
+    fun isNumber(input: String): Boolean {
+        var dotOccurred = 0
+        return input.all { it in '0'..'9' || it == '.' && dotOccurred++ < 1 }
+    }
+
+    fun isInteger(input: String) = input.all { it in '0'..'9' }
 
     fun verifyReqHandler(headers: HttpHeaders?): Boolean {
         return (headers != null && headers.get("Authorization") == this.config.getString("api.key")!!)
@@ -40,7 +48,6 @@ object Utils {
             .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
         return response
     }
-
     fun build400Resp(): DefaultHttpResponse {
         val response = DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST)
         response.headers()
