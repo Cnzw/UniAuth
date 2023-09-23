@@ -11,8 +11,10 @@ import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.*
 import org.bukkit.Bukkit
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
+import taboolib.module.lang.asLangText
 import java.net.InetSocketAddress
 
 object CancelReq: UniporterHttpHandler {
@@ -63,9 +65,8 @@ object CancelReq: UniporterHttpHandler {
         // 处理
         val name = AuthCache.getName(aid)!!
         val player = Bukkit.getPlayerExact(name)!!
-        Utils.debugLog("玩家 $name 拒绝授权 aid: $aid")
-        AuthCache.setStatus(aid, AuthStatus.FAIL)
-        player.kickPlayer("登录被拒绝") //TODO 同步 // TODO Lang
+        AuthCache.setStatus(aid, AuthStatus.FAIL, player.address!!)
+        player.kickPlayer(console().asLangText("kick-mp-cancel", player.name)) //TODO 同步
         // 构建返回
         val optJson = mapOf(
             "data" to mapOf(

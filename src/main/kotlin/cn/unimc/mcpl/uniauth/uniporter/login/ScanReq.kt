@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.*
 import org.bukkit.Bukkit
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
+import taboolib.platform.util.sendLang
 import java.net.InetSocketAddress
 
 
@@ -64,10 +65,10 @@ object ScanReq: UniporterHttpHandler {
         // 处理
         val name = AuthCache.getName(aid)!!
         val player = Bukkit.getPlayerExact(name)!!
-        player.updateInventory() // TODO 地图测试
-        player.sendMessage("扫码成功，等待授权...") // TODO Lang
         AuthCache.setStatus(aid, AuthStatus.SCAN)
-        Utils.debugLog("玩家 $name 扫码 aid: $aid")
+        player.updateInventory() // TODO 地图测试
+        player.sendLang("player-auth-scan", player.name)
+
         // 构建返回
         val optJson = mapOf(
             "data" to mapOf(

@@ -14,6 +14,7 @@ import org.bukkit.Bukkit
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
+import taboolib.platform.util.sendLang
 import java.net.InetSocketAddress
 
 object ConfirmReq: UniporterHttpHandler {
@@ -64,10 +65,9 @@ object ConfirmReq: UniporterHttpHandler {
         // 处理
         val name = AuthCache.getName(aid)!!
         val player = Bukkit.getPlayerExact(name)!!
-        player.removePotionEffect(PotionEffectType.BLINDNESS)
-        player.sendMessage("确认授权!") // TODO Lang
-        Utils.debugLog("玩家 $name 确认授权 aid: $aid")
         AuthCache.setStatus(aid, AuthStatus.ONLINE)
+        player.removePotionEffect(PotionEffectType.BLINDNESS)
+        player.sendLang("player-auth-confirm", player.name)
         // 构建返回
         val optJson = mapOf(
             "data" to mapOf(

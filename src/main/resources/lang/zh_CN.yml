@@ -1,0 +1,33 @@
+console-papi-not-load: "PlaceholderAPI 并未加载，部分功能受限"
+console-api-path-default: "检测到 api.path 是默认路径，已生成随机路径: {0}"
+console-api-key-default: "检测到 api.key 是默认密钥，已生成随机密钥: {0}"
+console-debug: "调试模式，启动!"
+
+kick-invalid-player-name: "用户名不合法" #0 玩家名
+kick-mp-cancel: "授权被拒绝" #0 玩家名
+kick-timeout: "登录超时" #0 玩家名
+
+player-auth-confirm:
+  ==: JSON
+  text: '这是一条[&9&n\[可点击\]]的信息player-auth-confirm'
+  args:
+    - hover: '你好'
+      command: '/say Hello'
+player-auth-scan:
+  ==: JSON
+  text: '这是一条[&9&n\[可点击\]]的信息player-auth-scan'
+  args:
+    - hover: '你好'
+      command: '/say Hello'
+player-log-prompt:
+  ==: JSON
+  text: '这是一条[&9&n\[可点击\]]的信息player-log-prompt'
+  args:
+    - hover: '你好'
+      command: '/say Hello'
+player-scan-prompt:
+  ==: JSON
+  text: '这是一条[&9&n\[可点击\]]的信息player-scan-prompt'
+  args:
+    - hover: '你好'
+      command: '/say Hello'
