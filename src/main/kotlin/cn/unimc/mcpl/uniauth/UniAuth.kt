@@ -12,7 +12,6 @@ import taboolib.platform.BukkitPlugin
 
 object UniAuth : Plugin() {
 
-    //TODO 语言文件和自定义发送方式
     val plugin by lazy { BukkitPlugin.getInstance() }
     var hasPapi: Boolean = false
 
@@ -20,18 +19,18 @@ object UniAuth : Plugin() {
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             hasPapi = true
         } else {
-            warning("软依赖 PlaceholderAPI 并未加载，部分功能受限")
+            warning("软依赖 PlaceholderAPI 并未加载，部分功能受限") // TODO LANG
         }
 
         if (Utils.config.getBoolean("metrics")) Metrics(19486, pluginVersion, runningPlatform)
 
         if (Utils.config.getString("api.path")!! == "uniauth") {
             Utils.config.set("api.path", Utils.getRandomString(6))
-            warning("检测到 api.path 是默认路径，已生成随机路径")
+            warning("检测到 api.path 是默认路径，已生成随机路径") // TODO LANG
         }
         if (Utils.config.getString("api.key")!! == "123456") {
             Utils.config.set("api.key", Utils.getRandomString(12))
-            warning("检测到 api.key 是默认密钥，已生成随机密钥")
+            warning("检测到 api.key 是默认密钥，已生成随机密钥") // TODO LANG
         }
 
         val path = Utils.config.getString("api.path")!!
