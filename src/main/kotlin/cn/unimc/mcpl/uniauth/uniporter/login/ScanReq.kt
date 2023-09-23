@@ -2,14 +2,15 @@ package cn.unimc.mcpl.uniauth.uniporter.login
 
 import cn.apisium.uniporter.router.api.Route
 import cn.apisium.uniporter.router.api.UniporterHttpHandler
-import cn.unimc.mcpl.uniauth.AidUtils
+import cn.unimc.mcpl.uniauth.AuthCache
+import cn.unimc.mcpl.uniauth.AuthStatus
 import cn.unimc.mcpl.uniauth.Utils
 import com.alibaba.fastjson2.toJSONByteArray
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.*
-import taboolib.common.platform.function.getProxyPlayer
+import org.bukkit.Bukkit
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
 import java.net.InetSocketAddress
@@ -34,8 +35,7 @@ object ScanReq: UniporterHttpHandler {
         val paramMap = QueryStringDecoder(request?.uri()).parameters()
         if (!paramMap.containsKey("aid")
             || paramMap["aid"]!![0].isNullOrBlank()
-            || !AidUtils.isInteger(paramMap["aid"]!![0])
-            || paramMap["aid"]!![0].toInt() % 2 == 1
+            || !Utils.isInteger(paramMap["aid"]!![0])
             ) {
             val response = DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST)
             response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
@@ -44,36 +44,42 @@ object ScanReq: UniporterHttpHandler {
         }
         // 验证 aid 参数
         val aid = paramMap["aid"]!![0].toInt()
-        if (!AidUtils.hasAid(aid)) {
-            val optJson = mapOf("data" to mapOf(
-                "success" to false,
-                "msg" to "aid not found"
-            ))
+        if (AuthCache.getStatus(aid) != AuthStatus.LOG) {
+            val optJson = mapOf(
+                "data" to mapOf(
+                    "success" to false,
+                    "msg" to "player is not in log status"
+                )
+            )
             val response: FullHttpResponse = DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.OK,
-                Unpooled.copiedBuffer(optJson.toJSONByteArray())
+                Unpooled.copiedBuffer(optJson.toJSONByteArray()) // TODO json
             )
-            response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+            response.headers().set("x-uniauth-version", pluginVersion)
+                .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
             context.writeAndFlush(response)?.addListener(ChannelFutureListener.CLOSE)
             return
         }
         // 处理
-        val name = AidUtils.getName(aid)
-        val player = getProxyPlayer(name)!!
-        player.sendMessage("扫码成功，等待授权...")
-        AidUtils.plusAid(aid)
-        info("玩家 $name 扫码 aid: $aid->${aid + 1}")
+        val name = AuthCache.getName(aid)!!
+        val player = Bukkit.getPlayerExact(name)!!
+        player.updateInventory() // TODO 地图测试
+        player.sendMessage("扫码成功，等待授权...") // TODO Lang
+        AuthCache.setStatus(aid, AuthStatus.SCAN)
+        Utils.debugLog("玩家 $name 扫码 aid: $aid")
         // 构建返回
-        val optJson = mapOf("data" to mapOf(
-            "success" to true,
-            "player_name" to player.displayName,
-            "ip" to player.address?.hostName
-        ))
+        val optJson = mapOf(
+            "data" to mapOf(
+                "success" to true,
+                "player_name" to player.displayName,
+                "ip" to player.address?.hostName
+            )
+        )
         val response: FullHttpResponse = DefaultFullHttpResponse(
             HttpVersion.HTTP_1_1,
             HttpResponseStatus.OK,
-            Unpooled.copiedBuffer(optJson.toJSONByteArray())
+            Unpooled.copiedBuffer(optJson.toJSONByteArray()) // TODO json
         )
         response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
         context.writeAndFlush(response)?.addListener(ChannelFutureListener.CLOSE)

@@ -2,14 +2,16 @@ package cn.unimc.mcpl.uniauth.uniporter.login
 
 import cn.apisium.uniporter.router.api.Route
 import cn.apisium.uniporter.router.api.UniporterHttpHandler
-import cn.unimc.mcpl.uniauth.AidUtils
+import cn.unimc.mcpl.uniauth.AuthCache
+import cn.unimc.mcpl.uniauth.AuthStatus
 import cn.unimc.mcpl.uniauth.Utils
 import com.alibaba.fastjson2.toJSONByteArray
 import io.netty.buffer.Unpooled
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.*
-import taboolib.common.platform.function.getProxyPlayer
+import org.bukkit.Bukkit
+import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
 import java.net.InetSocketAddress
@@ -33,8 +35,7 @@ object ConfirmReq: UniporterHttpHandler {
         val paramMap = QueryStringDecoder(request?.uri()).parameters()
         if (!paramMap.containsKey("aid")
             || paramMap["aid"]!![0].isNullOrBlank()
-            || !AidUtils.isInteger(paramMap["aid"]!![0])
-            || paramMap["aid"]!![0].toInt() % 2 == 0
+            || !Utils.isInteger(paramMap["aid"]!![0])
             ) {
             val response = DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST)
             response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.TEXT_PLAIN)
@@ -43,35 +44,41 @@ object ConfirmReq: UniporterHttpHandler {
         }
         // 验证 aid 参数
         val aid = paramMap["aid"]!![0].toInt()
-        if (!AidUtils.hasAid(aid)) {
-            val optJson = mapOf("data" to mapOf(
-                "success" to false,
-                "msg" to "aid not found"
-            ))
+        if (AuthCache.getStatus(aid) != AuthStatus.SCAN) {
+            val optJson = mapOf(
+                "data" to mapOf(
+                    "success" to false,
+                    "msg" to "player is not in scan status"
+                )
+            )
             val response: FullHttpResponse = DefaultFullHttpResponse(
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.OK,
-                Unpooled.copiedBuffer(optJson.toJSONByteArray())
+                Unpooled.copiedBuffer(optJson.toJSONByteArray()) // TODO json
             )
-            response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+            response.headers().set("x-uniauth-version", pluginVersion)
+                .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
             context.writeAndFlush(response)?.addListener(ChannelFutureListener.CLOSE)
             return
         }
         // 处理
-        val name = AidUtils.getName(aid)
-        val player = getProxyPlayer(name)!!
-        player.sendMessage("确认授权!")
-        info("玩家 $name 确认授权 aid: $aid")
-        AidUtils.delAid(aid)
+        val name = AuthCache.getName(aid)!!
+        val player = Bukkit.getPlayerExact(name)!!
+        player.removePotionEffect(PotionEffectType.BLINDNESS)
+        player.sendMessage("确认授权!") // TODO Lang
+        Utils.debugLog("玩家 $name 确认授权 aid: $aid")
+        AuthCache.setStatus(aid, AuthStatus.ONLINE)
         // 构建返回
-        val optJson = mapOf("data" to mapOf(
-            "success" to true,
-            "msg" to "ok"
-        ))
+        val optJson = mapOf(
+            "data" to mapOf(
+                "success" to true,
+                "msg" to "ok"
+            )
+        )
         val response: FullHttpResponse = DefaultFullHttpResponse(
             HttpVersion.HTTP_1_1,
             HttpResponseStatus.OK,
-            Unpooled.copiedBuffer(optJson.toJSONByteArray())
+            Unpooled.copiedBuffer(optJson.toJSONByteArray()) // TODO json
         )
         response.headers().set("x-uniauth-version", pluginVersion).set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
         context.writeAndFlush(response)?.addListener(ChannelFutureListener.CLOSE)
