@@ -1,0 +1,10 @@
+
+
+#         Powered by TabooLib 6.1         #
+
+
+debug: true
+metrics: true
+api:
+  path: "uniauth"
+  key: "123456"
