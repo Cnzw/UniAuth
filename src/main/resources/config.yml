@@ -8,3 +8,9 @@ metrics: true
 api:
   path: "uniauth"
   key: "123456"
+login:
+  enable: true
+  timeout: 60 # 秒
+  session: true
+  session-timeout: 600 # 秒
+  qrcode-url: "https://www.bing.com/search?q={0}"

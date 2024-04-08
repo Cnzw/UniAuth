@@ -47,7 +47,7 @@ object CmdReq : UniporterHttpHandler {
         val optJson = mapOf(
             "code" to 200,
             "data" to mapOf(
-                "result" to console().performCommand(paramMap["cmd"].toString())
+                "result" to console().performCommand(paramMap["cmd"].toString()) // TODO sync{}
             )
         )
         // 输出返回
