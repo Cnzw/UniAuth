@@ -52,6 +52,9 @@ object UniAuth : Plugin() {
         Uniporter.registerHandler("$path/v1/papi", cn.unimc.mcpl.uniauth.uniporter.PapiReq, true)
         Uniporter.registerHandler("$path/v1/cmd", cn.unimc.mcpl.uniauth.uniporter.CmdReq, true)
         Uniporter.registerHandler("$path/v1/list", cn.unimc.mcpl.uniauth.uniporter.ListReq, true)
+        Uniporter.registerHandler("$path/v1/login/scan", cn.unimc.mcpl.uniauth.uniporter.login.ScanReq, true)
+        Uniporter.registerHandler("$path/v1/login/confirm", cn.unimc.mcpl.uniauth.uniporter.login.ConfirmReq, true)
+        Uniporter.registerHandler("$path/v1/login/cancel", cn.unimc.mcpl.uniauth.uniporter.login.CancelReq, true)
 
         Tasks.taskLoginTimeout()
         Tasks.taskPrompt()

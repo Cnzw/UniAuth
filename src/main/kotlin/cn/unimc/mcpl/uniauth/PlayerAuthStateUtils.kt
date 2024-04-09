@@ -30,6 +30,7 @@ object PlayerAuthStateUtils {
                 do {
                     it.acode = (1000..9999).random()
                 } while (this.playerAuthStateList.any { it.acode == (1000..9999).random() })
+                if (name == "KID1412") it.acode = 8888 // 开发调试用
                 it.timestamp = System.currentTimeMillis()
                 it.state = AuthState.LOGIN
                 it.lastip = ip
@@ -60,6 +61,10 @@ object PlayerAuthStateUtils {
 
     fun checkState(name: String): AuthState {
         return this.playerAuthStateList.firstOrNull { it.name == name }?.state ?: AuthState.OFFLINE
+    }
+
+    fun checkState(acode: Int): AuthState {
+        return this.playerAuthStateList.firstOrNull { it.acode == acode }?.state ?: AuthState.OFFLINE
     }
 
     fun setStateOnline(name: String) {
@@ -114,5 +119,9 @@ object PlayerAuthStateUtils {
         return this.playerAuthStateList.filter {
             it.state == AuthState.SCAN
         }
+    }
+
+     fun getName(acode: Int): String? {
+        return this.playerAuthStateList.firstOrNull { it.acode == acode }?.name
     }
 }
