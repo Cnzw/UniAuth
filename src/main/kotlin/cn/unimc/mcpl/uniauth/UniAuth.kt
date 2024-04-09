@@ -12,7 +12,6 @@ import taboolib.module.lang.sendLang
 import taboolib.module.lang.sendWarn
 import taboolib.module.metrics.Metrics
 
-
 object UniAuth : Plugin() {
 
     @Config("config.yml")
@@ -53,5 +52,8 @@ object UniAuth : Plugin() {
         Uniporter.registerHandler("$path/v1/papi", cn.unimc.mcpl.uniauth.uniporter.PapiReq, true)
         Uniporter.registerHandler("$path/v1/cmd", cn.unimc.mcpl.uniauth.uniporter.CmdReq, true)
         Uniporter.registerHandler("$path/v1/list", cn.unimc.mcpl.uniauth.uniporter.ListReq, true)
+
+        Tasks.taskLoginTimeout()
+        Tasks.taskPrompt()
     }
 }

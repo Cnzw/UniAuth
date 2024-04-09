@@ -53,7 +53,7 @@ object KickReq : UniporterHttpHandler {
         if (paramMap.containsKey("reason")) {
             player!!.kick(paramMap["reason"]!![0])
         } else {
-            player!!.kick(console().asLangText("kick-req"))
+            player!!.kick(console().asLangText("kick-req")) // TODO
         }
 
         // 构建输出

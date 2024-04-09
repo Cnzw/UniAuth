@@ -4,9 +4,11 @@ console-api-path-default: "检测到 api.path 是默认路径，已生成随机�
 console-api-key-default: "检测到 api.key 是默认密钥，已生成随机密钥: {0}"
 
 kick-req: "你被踢了"
+kick-login-timeout: "§c扫码超时，请重新登录"
+kick-scan-timeout: "§c确认超时，请重新扫码"
 
 player-login-session: "§a登录成功，欢迎回来" # {0}=玩家名
 player-login-prompt: "§a请使用手机QQ扫码" # {0}=玩家名
-
-player-login-timeout: "§c登录超时，请重新登录"
-player-login-success: "§a登录成功"
+player-login-success: "§a扫码成功"
+player-scan-prompt: "§a请在手机上确认"
+player-scan-success: "§a登录成功"

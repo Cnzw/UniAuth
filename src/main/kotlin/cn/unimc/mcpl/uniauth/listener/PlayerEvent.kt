@@ -1,5 +1,6 @@
 package cn.unimc.mcpl.uniauth.listener
 
+import cn.unimc.mcpl.uniauth.AuthState
 import cn.unimc.mcpl.uniauth.PlayerAuthStateUtils
 import cn.unimc.mcpl.uniauth.UniAuth
 import cn.unimc.mcpl.uniauth.Utils
@@ -16,10 +17,12 @@ import taboolib.module.nms.NMSMap
 import taboolib.module.nms.sendMap
 import java.awt.image.BufferedImage
 
+// TODO 直接不监听
 object PlayerEvent {
     @SubscribeEvent
     fun onPlayerJoin(ev: PlayerJoinEvent) {
-        if (UniAuth.config.getBoolean("login.enable")) return
+        if (!UniAuth.config.getBoolean("login.enable")) return
+
         if (ev.player.hasPermission("uniauth.login.bypass")) {
             Utils.debugLog("玩家 ${ev.player.name} 拥有权限 uniauth.login.bypass，跳过登录")
             return
@@ -70,5 +73,17 @@ object PlayerEvent {
         ev.player.sendMap(image, NMSMap.Hand.OFF) // TODO
 
         adaptPlayer(ev.player).sendLang("player-login-prompt", ev.player.name)
+    }
+
+    @SubscribeEvent
+    fun onPlayerQuit(ev: PlayerJoinEvent) {
+        if (!UniAuth.config.getBoolean("login.enable")) return
+
+        if (PlayerAuthStateUtils.checkState(ev.player.name) == AuthState.ONLINE) {
+            PlayerAuthStateUtils.setStateOffline(ev.player.name)
+        } else {
+            ev.player.removePotionEffect(PotionEffectType.BLINDNESS)
+            PlayerAuthStateUtils.setStateFail(ev.player.name)
+        }
     }
 }

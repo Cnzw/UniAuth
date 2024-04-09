@@ -54,8 +54,12 @@ object PlayerAuthStateUtils {
             it.name == name
                     && it.state == AuthState.OFFLINE
                     && it.lastip == ip
-                    && System.currentTimeMillis() - it.timestamp < UniAuth.config.getLong("login.session-timeout") * 1000
+                    && System.currentTimeMillis() - it.timestamp < UniAuth.config.getInt("login.session-timeout") * 1000
         }
+    }
+
+    fun checkState(name: String): AuthState {
+        return this.playerAuthStateList.firstOrNull { it.name == name }?.state ?: AuthState.OFFLINE
     }
 
     fun setStateOnline(name: String) {
@@ -90,6 +94,25 @@ object PlayerAuthStateUtils {
                 it.state = AuthState.SCAN
                 it.timestamp = System.currentTimeMillis()
             }
+        }
+    }
+
+    fun getAuthTimeoutPlayers(): List<PlayerAuthState> {
+        return this.playerAuthStateList.filter {
+            (it.state == AuthState.LOGIN || it.state == AuthState.SCAN)
+                    && System.currentTimeMillis() - it.timestamp > UniAuth.config.getInt("login.timeout") * 1000
+        }
+    }
+
+    fun getStateLoginPlayers(): List<PlayerAuthState> {
+        return this.playerAuthStateList.filter {
+            it.state == AuthState.LOGIN
+        }
+    }
+
+    fun getStateScanPlayers(): List<PlayerAuthState> {
+        return this.playerAuthStateList.filter {
+            it.state == AuthState.SCAN
         }
     }
 }
