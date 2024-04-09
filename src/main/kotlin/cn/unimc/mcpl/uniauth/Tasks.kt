@@ -17,9 +17,9 @@ object Tasks {
             val tPlayer = PlayerAuthStateUtils.getAuthTimeoutPlayers()
             tPlayer.forEach {
                 if (it.state == AuthState.SCAN) {
-                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-scan-timeout", it.name)) // TODO
+                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-scan-timeout", it.name))
                 } else {
-                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-login-timeout", it.name)) // TODO
+                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-login-timeout", it.name))
                 }
                 PlayerAuthStateUtils.setStateFail(it.name)
             }
