@@ -8,6 +8,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.event.SubscribeEvent
@@ -48,7 +49,7 @@ object PlayerEvent {
         }
 
         val tacode = PlayerAuthStateUtils.addAcode(ev.player.name, ev.player.address)
-        Utils.debugLog("玩家 ${ev.player.name} ACode已生成，为 $tacode")
+        Utils.debugLog("玩家 ${ev.player.name} Acode $tacode 状态改变，为 LOGIN")
 
         val hints = mapOf<EncodeHintType, Any>(
             EncodeHintType.CHARACTER_SET to "UTF-8",
@@ -76,14 +77,16 @@ object PlayerEvent {
     }
 
     @SubscribeEvent
-    fun onPlayerQuit(ev: PlayerJoinEvent) {
+    fun onPlayerQuit(ev: PlayerQuitEvent) {
         if (!UniAuth.config.getBoolean("login.enable")) return
 
         if (PlayerAuthStateUtils.checkState(ev.player.name) == AuthState.ONLINE) {
             PlayerAuthStateUtils.setStateOffline(ev.player.name)
+            Utils.debugLog("玩家 ${ev.player.name} 状态改变，为 OFFLINE")
         } else {
             ev.player.removePotionEffect(PotionEffectType.BLINDNESS)
             PlayerAuthStateUtils.setStateFail(ev.player.name)
+            Utils.debugLog("玩家 ${ev.player.name} 状态改变，为 FAIL")
         }
     }
 }

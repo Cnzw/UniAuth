@@ -15,6 +15,7 @@ import taboolib.common.platform.function.onlinePlayers
 import java.lang.management.ManagementFactory
 import java.net.InetSocketAddress
 
+// TODO 告知需要server扩展
 object ServerReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
         // 访问日志

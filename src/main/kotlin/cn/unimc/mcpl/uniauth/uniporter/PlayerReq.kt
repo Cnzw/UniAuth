@@ -35,18 +35,13 @@ object PlayerReq : UniporterHttpHandler {
         val paramMap = QueryStringDecoder(request?.uri()).parameters()
         if (!paramMap.containsKey("name")
             || paramMap["name"]?.get(0).isNullOrBlank()
-            || !paramMap.containsKey("uuid")
-            || paramMap["uuid"]?.get(0).isNullOrBlank()
         ) {
             context.writeAndFlush(Utils.build400Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
 
-        val player = if (paramMap.containsKey("uuid")) {
-            getProxyPlayer(UUID.fromString(paramMap["uuid"]!![0]))
-        } else if (paramMap.containsKey("name")) {
-            getProxyPlayer(paramMap["name"]!![0])
-        } else {
+        val player = getProxyPlayer(paramMap["name"]!![0])
+        if (player == null) {
             context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
@@ -59,7 +54,7 @@ object PlayerReq : UniporterHttpHandler {
                     "online" to player.isOnline(),
                     "name" to player.displayName,
                     "uuid" to player.uniqueId.toString(),
-                    "ip" to player.address.toString(),
+                    "ip" to player.address?.hostString,
                     "ping" to player.ping,
                     "uptime" to (System.currentTimeMillis() - player.lastPlayed) / 1000 / 60,
                     "firstJoinTime" to player.firstPlayed,
