@@ -19,7 +19,7 @@ taboolib {
     env {
         // 安装模块
         install(UNIVERSAL, BUKKIT)
-        install(BUKKIT_HOOK, CHAT, CONFIGURATION, LANG, METRICS, NMS, NMS_UTIL)
+        install(BUKKIT_ALL, CHAT, CONFIGURATION, LANG, METRICS, NMS, NMS_UTIL)
     }
     version { taboolib = "6.1.1-beta17" }
     description {
