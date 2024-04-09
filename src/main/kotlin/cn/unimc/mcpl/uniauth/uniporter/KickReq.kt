@@ -11,6 +11,7 @@ import io.netty.handler.codec.http.HttpMethod
 import io.netty.handler.codec.http.QueryStringDecoder
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
+import taboolib.common.util.sync
 import taboolib.module.lang.asLangText
 import java.net.InetSocketAddress
 import java.util.*
@@ -34,26 +35,21 @@ object KickReq : UniporterHttpHandler {
         val paramMap = QueryStringDecoder(request?.uri()).parameters()
         if (!paramMap.containsKey("name")
             || paramMap["name"]?.get(0).isNullOrBlank()
-            || !paramMap.containsKey("uuid")
-            || paramMap["uuid"]?.get(0).isNullOrBlank()
         ) {
             context.writeAndFlush(Utils.build400Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
 
-        val player = if (paramMap.containsKey("uuid")) {
-            getProxyPlayer(UUID.fromString(paramMap["uuid"]!![0]))
-        } else if (paramMap.containsKey("name")) {
-            getProxyPlayer(paramMap["name"]!![0])
-        } else {
+        val player = getProxyPlayer(paramMap["name"]!![0])
+        if (player == null) {
             context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
 
         if (paramMap.containsKey("reason")) {
-            player!!.kick(paramMap["reason"]!![0])
+            sync {player!!.kick(paramMap["reason"]!![0])}
         } else {
-            player!!.kick(console().asLangText("kick-req")) // TODO
+            sync { player!!.kick(console().asLangText("kick-req")) }
         }
 
         // 构建输出

@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.multipart.Attribute
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder
 import io.netty.handler.codec.http.multipart.InterfaceHttpData
 import taboolib.common.platform.function.console
+import taboolib.common.util.sync
 import java.net.InetSocketAddress
 
 object CmdReq : UniporterHttpHandler {
@@ -47,7 +48,7 @@ object CmdReq : UniporterHttpHandler {
         val optJson = mapOf(
             "code" to 200,
             "data" to mapOf(
-                "result" to console().performCommand(paramMap["cmd"].toString()) // TODO sync{}
+                "result" to sync { console().performCommand(paramMap["cmd"].toString()) }
             )
         )
         // 输出返回
