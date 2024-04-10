@@ -15,6 +15,7 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.NMSMap
+import taboolib.module.nms.nmsProxy
 import taboolib.module.nms.sendMap
 import java.awt.image.BufferedImage
 
@@ -56,7 +57,7 @@ object PlayerEvent {
             EncodeHintType.MARGIN to 0
         )
         val bitMatrix = MultiFormatWriter().encode(
-            String.format(UniAuth.config.getString("login.qrcode-url")!!, tacode),
+            String.format(UniAuth.config.getString("login.qrcode-url")!!, tacode, UniAuth.config.getString("login.server-id")),
             BarcodeFormat.QR_CODE,
             128,
             128,
