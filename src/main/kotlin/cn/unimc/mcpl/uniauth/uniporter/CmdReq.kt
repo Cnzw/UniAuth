@@ -2,6 +2,7 @@ package cn.unimc.mcpl.uniauth.uniporter
 
 import cn.apisium.uniporter.router.api.Route
 import cn.apisium.uniporter.router.api.UniporterHttpHandler
+import cn.unimc.mcpl.uniauth.UniAuth
 import cn.unimc.mcpl.uniauth.Utils
 import com.google.gson.Gson
 import io.netty.channel.ChannelFutureListener
@@ -20,6 +21,11 @@ object CmdReq : UniporterHttpHandler {
         // 访问日志
         val inSocket: InetSocketAddress = context?.channel()?.remoteAddress() as InetSocketAddress
         Utils.debugLog(inSocket.hostName + " - " + request?.method()?.name() + " " + path)
+
+        if (!UniAuth.config.getBoolean("login.cmd")) {
+            context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
+            return
+        }
         // 验证 Header Authorization
         if (!Utils.verifyReqHandler(request?.headers())) {
             context.writeAndFlush(Utils.build401Resp())?.addListener(ChannelFutureListener.CLOSE)

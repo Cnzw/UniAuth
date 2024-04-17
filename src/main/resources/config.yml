@@ -12,6 +12,8 @@ login:
   enable: true
   timeout: 120 # 秒
   session: true
+  blind: false
   session-timeout: 600 # 秒
   server-id: "1"
   qrcode-url: "https://www.bing.com/search?q={0}-{1}" # {0}=code {1}=serverid
+  cmd: false
