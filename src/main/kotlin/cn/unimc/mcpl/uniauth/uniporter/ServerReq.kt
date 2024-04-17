@@ -52,7 +52,13 @@ object ServerReq : UniporterHttpHandler {
                 ),
                 "motd" to Bukkit.getMotd(),
                 "maxPlayers" to Bukkit.getMaxPlayers(),
-                "onlinePlayers" to onlinePlayers().count()
+                "onlinePlayers" to onlinePlayers().count(),
+                "players" to onlinePlayers().map {
+                    mapOf(
+                        "uuid" to it.uniqueId.toString(),
+                        "name" to it.displayName
+                    )
+                }
             )
         )
         context.writeAndFlush(Utils.build200RespByByteBuf(Gson().toJson(optJson).toByteArray()))

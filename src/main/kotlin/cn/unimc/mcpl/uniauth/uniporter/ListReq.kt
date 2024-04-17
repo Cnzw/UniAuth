@@ -8,7 +8,10 @@ import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod
+import org.bukkit.Bukkit
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.platform.compat.getBalance
+import taboolib.platform.compat.isEconomySupported
 import java.net.InetSocketAddress
 
 object ListReq : UniporterHttpHandler {
@@ -33,11 +36,34 @@ object ListReq : UniporterHttpHandler {
                 "online" to onlinePlayers().count(),
                 "players" to onlinePlayers().map {
                     mapOf(
+                        "online" to it.isOnline(),
+                        "name" to it.displayName,
                         "uuid" to it.uniqueId.toString(),
-                        "name" to it.displayName
-                    )
+                        "ip" to it.address?.hostString,
+                        "ping" to it.ping,
+                        "uptime" to (System.currentTimeMillis() - it.lastPlayed) / 1000 / 60,
+                        "firstJoinTime" to it.firstPlayed,
+                        "health" to it.health,
+                        "food" to it.foodLevel,
+                        "saturation" to it.saturation,
+                        "level" to it.level,
+                        "exp" to it.exp,
+                        "location" to mapOf(
+                            "world" to it.world,
+                            "x" to it.location.x,
+                            "y" to it.location.y,
+                            "z" to it.location.z,
+                            "yaw" to it.location.yaw,
+                            "pitch" to it.location.pitch
+                        )
+                    ) + if (isEconomySupported) {
+                        mapOf("money" to Bukkit.getPlayer(it.uniqueId).getBalance())
+                    } else {
+                        mapOf()
+                    }
                 }
-            ))
+            )
+        )
         // 输出返回
         context.writeAndFlush(Utils.build200RespByByteBuf(Gson().toJson(optJson).toByteArray()))
             ?.addListener(ChannelFutureListener.CLOSE)
