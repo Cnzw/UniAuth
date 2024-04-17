@@ -13,6 +13,7 @@ import io.netty.handler.codec.http.multipart.Attribute
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder
 import io.netty.handler.codec.http.multipart.InterfaceHttpData
 import taboolib.common.platform.function.console
+import taboolib.common.platform.function.info
 import taboolib.common.util.sync
 import java.net.InetSocketAddress
 
@@ -50,6 +51,7 @@ object CmdReq : UniporterHttpHandler {
             context.writeAndFlush(Utils.build400Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
+        info("$path 执行指令 ${paramMap["cmd"].toString()}")
         // 构建返回
         val optJson = mapOf(
             "code" to 200,
