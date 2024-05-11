@@ -57,7 +57,10 @@ object ConfirmReq : UniporterHttpHandler {
         val optJson = mapOf(
             "code" to 200,
             "data" to mapOf(
-                "result" to true
+                "result" to true,
+                "name" to name,
+                "ip" to player.address.hostString,
+                "uuid" to player.uniqueId.toString()
             )
         )
         context.writeAndFlush(Utils.build200RespByByteBuf(Gson().toJson(optJson).toByteArray()))

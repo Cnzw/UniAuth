@@ -57,7 +57,8 @@ object ScanReq : UniporterHttpHandler {
             "code" to 200,
             "data" to mapOf(
                 "name" to name,
-                "ip" to player.address.hostString
+                "ip" to player.address.hostString,
+                "uuid" to player.uniqueId.toString()
             )
         )
         context.writeAndFlush(Utils.build200RespByByteBuf(Gson().toJson(optJson).toByteArray()))
