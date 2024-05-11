@@ -14,7 +14,6 @@ import taboolib.common.platform.function.getProxyPlayer
 import taboolib.platform.compat.getBalance
 import taboolib.platform.compat.isEconomySupported
 import java.net.InetSocketAddress
-import java.util.UUID
 
 object PlayerReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
@@ -54,10 +53,14 @@ object PlayerReq : UniporterHttpHandler {
                     "online" to offlinePlayer.isOnline,
                     "name" to offlinePlayer.name,
                     "uuid" to offlinePlayer.uniqueId.toString(),
-                    "lastPlayed" to offlinePlayer.lastPlayed.toString(),
-                    "firstPlayed" to offlinePlayer.firstPlayed.toString(),
+                    "lastPlayed" to offlinePlayer.lastPlayed,
+                    "firstPlayed" to offlinePlayer.firstPlayed,
                 )
-            )
+            ) + if (isEconomySupported) {
+                mapOf("money" to offlinePlayer.getBalance())
+            } else {
+                mapOf()
+            }
         } else {
             mapOf(
                 "code" to 200,
