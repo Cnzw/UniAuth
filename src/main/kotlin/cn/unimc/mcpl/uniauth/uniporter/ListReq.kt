@@ -42,7 +42,7 @@ object ListReq : UniporterHttpHandler {
                         "ip" to it.address?.hostString,
                         "ping" to it.ping,
                         "uptime" to (System.currentTimeMillis() - it.lastPlayed) / 1000 / 60,
-                        "firstJoinTime" to it.firstPlayed,
+                        "firstPlayed" to it.firstPlayed,
                         "health" to it.health,
                         "food" to it.foodLevel,
                         "saturation" to it.saturation,

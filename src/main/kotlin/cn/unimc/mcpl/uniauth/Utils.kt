@@ -4,6 +4,7 @@ import io.netty.buffer.Unpooled
 import io.netty.handler.codec.http.*
 import taboolib.common.platform.function.info
 import taboolib.common.platform.function.pluginVersion
+import java.util.UUID
 
 object Utils {
     fun debugLog(msg: String) {
@@ -62,5 +63,9 @@ object Utils {
             .set("x-uniauth-version", pluginVersion)
             .set(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
         return response
+    }
+
+    fun getOfflineUUID(name: String): UUID {
+        return UUID.nameUUIDFromBytes("OfflinePlayer:$name".toByteArray())
     }
 }

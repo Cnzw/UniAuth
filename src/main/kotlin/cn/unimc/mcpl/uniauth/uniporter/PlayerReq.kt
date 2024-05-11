@@ -41,13 +41,24 @@ object PlayerReq : UniporterHttpHandler {
         }
 
         val player = getProxyPlayer(paramMap["name"]!![0])
-        if (player == null) {
-            context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
-            return
-        }
-
         // 构建返回
-        val optJson = if (player!!.isOnline()) {
+        val optJson = if (player == null) {
+            val offlinePlayer = Bukkit.getOfflinePlayer(Utils.getOfflineUUID(paramMap["name"]!![0])) // TODO 正版服务器UUID获取
+            if (!offlinePlayer.hasPlayedBefore()) {
+                context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
+                return
+            }
+            mapOf(
+                "code" to 200,
+                "data" to mapOf(
+                    "online" to offlinePlayer.isOnline,
+                    "name" to offlinePlayer.name,
+                    "uuid" to offlinePlayer.uniqueId.toString(),
+                    "lastPlayed" to offlinePlayer.lastPlayed.toString(),
+                    "firstPlayed" to offlinePlayer.firstPlayed.toString(),
+                )
+            )
+        } else {
             mapOf(
                 "code" to 200,
                 "data" to mapOf(
@@ -57,7 +68,7 @@ object PlayerReq : UniporterHttpHandler {
                     "ip" to player.address?.hostString,
                     "ping" to player.ping,
                     "uptime" to (System.currentTimeMillis() - player.lastPlayed) / 1000 / 60,
-                    "firstJoinTime" to player.firstPlayed,
+                    "firstPlayed" to player.firstPlayed,
                     "health" to player.health,
                     "food" to player.foodLevel,
                     "saturation" to player.saturation,
@@ -77,21 +88,8 @@ object PlayerReq : UniporterHttpHandler {
                     mapOf()
                 }
             )
-        } else {
-            mapOf(
-                "code" to 200,
-                "data" to mapOf(
-                    "online" to player.isOnline(),
-                    "name" to player.displayName,
-                    "uuid" to player.uniqueId.toString(),
-                    "firstJoinTime" to player.firstPlayed,
-                ) + if (isEconomySupported) {
-                    mapOf("money" to Bukkit.getOfflinePlayer(player.uniqueId).getBalance())
-                } else {
-                    mapOf()
-                }
-            )
         }
+
         // 输出返回
         context.writeAndFlush(Utils.build200RespByByteBuf(Gson().toJson(optJson).toByteArray()))
             ?.addListener(ChannelFutureListener.CLOSE)
