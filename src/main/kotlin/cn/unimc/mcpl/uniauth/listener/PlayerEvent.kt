@@ -19,7 +19,6 @@ import taboolib.module.nms.nmsProxy
 import taboolib.module.nms.sendMap
 import java.awt.image.BufferedImage
 
-// TODO 直接不监听
 object PlayerEvent {
     @SubscribeEvent
     fun onPlayerJoin(ev: PlayerJoinEvent) {

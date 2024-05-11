@@ -11,11 +11,12 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import taboolib.common.platform.function.console
 import taboolib.common.platform.function.onlinePlayers
+import taboolib.module.lang.sendWarn
 import java.lang.management.ManagementFactory
 import java.net.InetSocketAddress
 
-// TODO 告知需要server扩展
 object ServerReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
         // 访问日志
@@ -35,6 +36,7 @@ object ServerReq : UniporterHttpHandler {
         val tps: String? = if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
             PlaceholderAPI.setPlaceholders(null, "%server_tps_5%")
         } else {
+            console().sendWarn("console-papi-not-load")
             null
         }
         // 构建返回

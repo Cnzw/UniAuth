@@ -10,10 +10,13 @@ api:
   key: "123456"
 login:
   enable: true
-  timeout: 120 # 秒
+  # 秒
+  timeout: 120
   session: true
   blind: false
-  session-timeout: 600 # 秒
+  # 秒
+  session-timeout: 600
   server-id: "1"
-  qrcode-url: "https://www.bing.com/search?q={0}-{1}" # {0}=code {1}=serverid
+  # {0}=code {1}=serverid
+  qrcode-url: "https://ua.unimc.cn/mp/login?server={1}&code={0}"
   cmd: false
