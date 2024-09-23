@@ -12,11 +12,18 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod
 import io.netty.handler.codec.http.QueryStringDecoder
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.common.platform.function.console
 import taboolib.common.util.sync
 import taboolib.module.lang.asLangText
+import taboolib.platform.type.BukkitProxyEvent
 import java.net.InetSocketAddress
+
+data class UniAuthCancelEvent(
+    val player: Player,
+    val code: Int
+): BukkitProxyEvent()
 
 object CancelReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
@@ -52,6 +59,8 @@ object CancelReq : UniporterHttpHandler {
         // 监听器里已经写了Fail代码
         // PlayerAuthStateUtils.setStateFail(name)
         sync { player.kickPlayer(console().asLangText("kick-login-cancel")) }
+
+        UniAuthCancelEvent(player, paramMap["code"]!![0].toInt()).call()
 
         // 构建返回
         val optJson = mapOf(

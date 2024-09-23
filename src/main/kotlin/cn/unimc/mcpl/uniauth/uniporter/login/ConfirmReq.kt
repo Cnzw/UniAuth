@@ -12,10 +12,17 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod
 import io.netty.handler.codec.http.QueryStringDecoder
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.potion.PotionEffectType
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.lang.sendLang
+import taboolib.platform.type.BukkitProxyEvent
 import java.net.InetSocketAddress
+
+data class UniAuthConfirmEvent(
+    val player: Player,
+    val code: Int
+): BukkitProxyEvent()
 
 object ConfirmReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
@@ -52,6 +59,8 @@ object ConfirmReq : UniporterHttpHandler {
         Utils.debugLog("玩家 $name Acode ${paramMap["code"]!![0]} 状态改变，为 ONLINE")
         player.removePotionEffect(PotionEffectType.BLINDNESS)
         adaptPlayer(player).sendLang("player-scan-success", name)
+
+        UniAuthConfirmEvent(player, paramMap["code"]!![0].toInt()).call()
 
         // 构建返回
         val optJson = mapOf(

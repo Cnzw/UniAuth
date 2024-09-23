@@ -12,9 +12,16 @@ import io.netty.handler.codec.http.FullHttpRequest
 import io.netty.handler.codec.http.HttpMethod
 import io.netty.handler.codec.http.QueryStringDecoder
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.lang.sendLang
+import taboolib.platform.type.BukkitProxyEvent
 import java.net.InetSocketAddress
+
+data class UniAuthScanEvent(
+    val player: Player,
+    val code: Int
+): BukkitProxyEvent()
 
 object ScanReq : UniporterHttpHandler {
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
@@ -51,6 +58,8 @@ object ScanReq : UniporterHttpHandler {
         Utils.debugLog("玩家 $name Acode ${paramMap["code"]!![0]} 状态改变，为 SCAN")
         player.updateInventory() // TODO
         adaptPlayer(player).sendLang("player-login-success", name)
+
+        UniAuthScanEvent(player, paramMap["code"]!![0].toInt()).call()
 
         // 构建返回
         val optJson = mapOf(

@@ -7,6 +7,7 @@ import cn.unimc.mcpl.uniauth.Utils
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
+import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.potion.PotionEffect
@@ -15,9 +16,19 @@ import taboolib.common.platform.event.SubscribeEvent
 import taboolib.common.platform.function.adaptPlayer
 import taboolib.module.lang.sendLang
 import taboolib.module.nms.NMSMap
-import taboolib.module.nms.nmsProxy
 import taboolib.module.nms.sendMap
+import taboolib.platform.type.BukkitProxyEvent
 import java.awt.image.BufferedImage
+
+data class UniAuthLoginEvent(
+    val player: Player,
+    val code: Int // 0=跳过登录 1=Session 登录
+): BukkitProxyEvent()
+
+data class UniAuthLogoutEvent(
+    val player: Player,
+    val state: AuthState
+): BukkitProxyEvent()
 
 object PlayerEvent {
     @SubscribeEvent
@@ -26,6 +37,7 @@ object PlayerEvent {
 
         if (ev.player.hasPermission("uniauth.login.bypass")) {
             Utils.debugLog("玩家 ${ev.player.name} 拥有权限 uniauth.login.bypass，跳过登录")
+            UniAuthLoginEvent(ev.player, 0).call()
             return
         }
 
@@ -33,6 +45,7 @@ object PlayerEvent {
             Utils.debugLog("玩家 ${ev.player.name} 通过 Session 登录")
             PlayerAuthStateUtils.setStateOnline(ev.player.name)
             adaptPlayer(ev.player).sendLang("player-login-session", ev.player.name)
+            UniAuthLoginEvent(ev.player, 1).call()
             return
         }
 
@@ -72,6 +85,7 @@ object PlayerEvent {
         }
 
         ev.player.sendMap(image, NMSMap.Hand.OFF) // TODO
+        UniAuthLoginEvent(ev.player, tacode).call()
 
         adaptPlayer(ev.player).sendLang("player-login-prompt", ev.player.name)
     }
@@ -83,10 +97,12 @@ object PlayerEvent {
         if (PlayerAuthStateUtils.checkState(ev.player.name) == AuthState.ONLINE) {
             PlayerAuthStateUtils.setStateOffline(ev.player.name)
             Utils.debugLog("玩家 ${ev.player.name} 状态改变，为 OFFLINE")
+            UniAuthLogoutEvent(ev.player, AuthState.OFFLINE).call()
         } else {
             ev.player.removePotionEffect(PotionEffectType.BLINDNESS)
             PlayerAuthStateUtils.setStateFail(ev.player.name)
             Utils.debugLog("玩家 ${ev.player.name} 状态改变，为 FAIL")
+            UniAuthLogoutEvent(ev.player, AuthState.FAIL).call()
         }
     }
 }
