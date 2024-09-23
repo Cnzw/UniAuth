@@ -11,6 +11,6 @@ kick-login-cancel: "§c登录取消"
 
 player-login-session: "§a登录成功，欢迎回来" # {0}=玩家名
 player-login-prompt: "§a请使用手机QQ扫码" # {0}=玩家名
-player-login-success: "§a扫码成功"
-player-scan-prompt: "§a请在手机上确认"
-player-scan-success: "§a登录成功"
+player-login-success: "§a扫码成功" # {0}=玩家名
+player-scan-prompt: "§a请在手机上确认" # {0}=玩家名
+player-scan-success: "§a登录成功" # {0}=玩家名

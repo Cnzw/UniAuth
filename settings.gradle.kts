@@ -1,1 +1,1 @@
-rootProject.name="UniAuth"
+rootProject.name = "UniAuth"

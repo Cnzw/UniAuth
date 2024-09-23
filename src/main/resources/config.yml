@@ -1,22 +1,17 @@
-
-
-#         Powered by TabooLib 6.1         #
-
-
-debug: true
+debug: false
 metrics: true
 api:
   path: "uniauth"
   key: "123456"
 login:
-  enable: true
+  server-id: "uniauth"
+  enable: false
   # 秒
   timeout: 120
   session: true
   blind: false
   # 秒
   session-timeout: 600
-  server-id: "1"
-  # {0}=code {1}=serverid
+  # {0}=serverid {1}=code
   qrcode-url: "https://ua.unimc.cn/mp/login?server={1}&code={0}"
   cmd: false
