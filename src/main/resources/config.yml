@@ -1,0 +1,17 @@
+debug: false
+metrics: true
+api:
+  path: "uniauth"
+  key: "123456"
+login:
+  server-id: "uniauth"
+  enable: false
+  # 秒
+  timeout: 120
+  session: true
+  blind: false
+  # 秒
+  session-timeout: 600
+  # {0}=serverid {1}=code
+  qrcode-url: "https://ua.unimc.cn/mp/login?server={1}&code={0}"
+  cmd: false
