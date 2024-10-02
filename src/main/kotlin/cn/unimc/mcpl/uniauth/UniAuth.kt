@@ -56,7 +56,10 @@ object UniAuth : Plugin() {
         Uniporter.registerHandler("$path/v1/login/confirm", cn.unimc.mcpl.uniauth.uniporter.login.ConfirmReq, true)
         Uniporter.registerHandler("$path/v1/login/cancel", cn.unimc.mcpl.uniauth.uniporter.login.CancelReq, true)
 
+        Uniporter.registerHandler("$path/v1/metrics", cn.unimc.mcpl.uniauth.uniporter.prometheus.Metrics, true)
+
         Tasks.taskLoginTimeout()
         Tasks.taskPrompt()
+        Tasks.taskPushGateway()
     }
 }

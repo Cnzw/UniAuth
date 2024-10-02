@@ -4,8 +4,8 @@ api:
   path: "uniauth"
   key: "123456"
 login:
-  server-id: "uniauth"
   enable: false
+  server-id: "uniauth"
   # 秒
   timeout: 120
   session: true
@@ -15,3 +15,7 @@ login:
   # {0}=serverid {1}=code
   qrcode-url: "https://ua.unimc.cn/mp/login?server={1}&code={0}"
   cmd: false
+prometheus:
+  enable: false
+  pushgateway: false
+  pushgateway-url: "http://localhost:9091"

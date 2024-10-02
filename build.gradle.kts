@@ -59,6 +59,9 @@ dependencies {
     compileOnly("com.github.Apisium:Uniporter:1.3.4-SNAPSHOT")
     compileOnly("com.google.code.gson:gson:2.11.0")
     taboo("com.google.zxing:javase:3.5.3")
+    taboo("io.prometheus:prometheus-metrics-core:1.3.1")
+    taboo("io.prometheus:prometheus-metrics-exposition-formats:1.3.1")
+    taboo("io.prometheus:prometheus-metrics-exporter-pushgateway:1.3.1")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }
