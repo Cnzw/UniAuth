@@ -38,6 +38,38 @@ object Metrics : UniporterHttpHandler {
         .help("TPS")
         .register()
 
+    val chunks: Gauge = Gauge.builder()
+        .name("loaded_chunks")
+        .help("Loaded chunks count")
+        .labelNames("world")
+        .register()
+
+    val entities: Gauge = Gauge.builder()
+        .name("entities")
+        .help("Entities count")
+        .labelNames("world")
+        .register()
+
+    fun collectMetrics() {
+        memory.labelValues("max").set(Runtime.getRuntime().maxMemory().toDouble() / 1048576)
+        memory.labelValues("free").set(Runtime.getRuntime().freeMemory().toDouble() / 1048576)
+        memory.labelValues("total").set(Runtime.getRuntime().totalMemory().toDouble() / 1048576)
+        memory.labelValues("used").set((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / 1048576)
+
+        for (world in Bukkit.getWorlds()) {
+            onlinePlayers.labelValues(world.name).set(world.players.size.toDouble())
+            chunks.labelValues(world.name).set(world.loadedChunks.size.toDouble())
+            entities.labelValues(world.name).set(world.entities.size.toDouble())
+        }
+
+        if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
+            tps.set(PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble())
+        } else {
+            console().sendWarn("console-papi-not-load")
+            tps.set(20.0)
+        }
+    }
+
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
         // 访问日志
         val inSocket: InetSocketAddress = context?.channel()?.remoteAddress() as InetSocketAddress
@@ -53,21 +85,7 @@ object Metrics : UniporterHttpHandler {
             return
         }
         // 构建返回
-        memory.labelValues("max").set(Runtime.getRuntime().maxMemory().toDouble() / 1048576)
-        memory.labelValues("free").set(Runtime.getRuntime().freeMemory().toDouble() / 1048576)
-        memory.labelValues("total").set(Runtime.getRuntime().totalMemory().toDouble() / 1048576)
-        memory.labelValues("used").set((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / 1048576)
-
-        for (world in Bukkit.getWorlds()) {
-            onlinePlayers.labelValues(world.name).set(world.players.size.toDouble())
-        }
-
-        if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
-            tps.set(PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble())
-        } else {
-            console().sendWarn("console-papi-not-load")
-            tps.set(20.0)
-        }
+        collectMetrics()
 
         val metricsTextFormat = PrometheusTextFormatWriter(true)
         val outputStream = ByteArrayOutputStream()

@@ -1,18 +1,13 @@
 package cn.unimc.mcpl.uniauth
 
-import cn.unimc.mcpl.uniauth.uniporter.prometheus.Metrics.memory
-import cn.unimc.mcpl.uniauth.uniporter.prometheus.Metrics.onlinePlayers
-import cn.unimc.mcpl.uniauth.uniporter.prometheus.Metrics.tps
+import cn.unimc.mcpl.uniauth.uniporter.prometheus.Metrics
 import io.prometheus.metrics.exporter.pushgateway.PushGateway
 import io.prometheus.metrics.exporter.pushgateway.Scheme
-import me.clip.placeholderapi.PlaceholderAPI
-import org.bukkit.Bukkit
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.getProxyPlayer
 import taboolib.common.platform.function.submit
 import taboolib.module.lang.asLangText
 import taboolib.module.lang.sendLang
-import taboolib.module.lang.sendWarn
 import java.net.URI
 
 object Tasks {
@@ -68,21 +63,7 @@ object Tasks {
             .build()
 
         submit (period = 60*20){
-            memory.labelValues("max").set(Runtime.getRuntime().maxMemory().toDouble() / 1048576)
-            memory.labelValues("free").set(Runtime.getRuntime().freeMemory().toDouble() / 1048576)
-            memory.labelValues("total").set(Runtime.getRuntime().totalMemory().toDouble() / 1048576)
-            memory.labelValues("used").set((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / 1048576)
-
-            for (world in Bukkit.getWorlds()) {
-                onlinePlayers.labelValues(world.name).set(world.players.size.toDouble())
-            }
-
-            if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
-                tps.set(PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble())
-            } else {
-                console().sendWarn("console-papi-not-load")
-                tps.set(20.0)
-            }
+            Metrics.collectMetrics()
 
             Utils.debugLog("Prometheus PushGateway Pushing")
             pushGateway.push()
