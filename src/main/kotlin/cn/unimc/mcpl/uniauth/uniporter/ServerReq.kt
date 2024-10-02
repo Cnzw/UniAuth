@@ -33,8 +33,8 @@ object ServerReq : UniporterHttpHandler {
             return
         }
 
-        val tps: String? = if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
-            PlaceholderAPI.setPlaceholders(null, "%server_tps_5%")
+        val tps: Double? = if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
+            PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble()
         } else {
             console().sendWarn("console-papi-not-load")
             null
@@ -48,9 +48,10 @@ object ServerReq : UniporterHttpHandler {
                 "health" to mapOf(
                     "uptime" to ManagementFactory.getRuntimeMXBean().uptime / 1000 / 60,
                     "tps" to tps,
-                    "totalMemory" to Runtime.getRuntime().totalMemory(),
-                    "maxMemory" to Runtime.getRuntime().maxMemory(),
-                    "freeMemory" to Runtime.getRuntime().freeMemory()
+                    "totalMemory" to Runtime.getRuntime().totalMemory().toDouble() / 1048576,
+                    "maxMemory" to Runtime.getRuntime().maxMemory().toDouble() / 1048576,
+                    "freeMemory" to Runtime.getRuntime().freeMemory().toDouble() / 1048576,
+                    "usedMemory" to (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / 1048576
                 ),
                 "motd" to Bukkit.getMotd(),
                 "maxPlayers" to Bukkit.getMaxPlayers(),
