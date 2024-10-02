@@ -21,6 +21,12 @@ object PapiReq : UniporterHttpHandler {
         // 访问日志
         val inSocket: InetSocketAddress = context?.channel()?.remoteAddress() as InetSocketAddress
         Utils.debugLog(inSocket.hostName + " - " + request?.method()?.name() + " " + path)
+
+        if (!UniAuth.PapiEnabled) {
+            context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
+            return
+        }
+
         // 验证 Header Authorization
         if (!Utils.verifyReqHandler(request?.headers())) {
             context.writeAndFlush(Utils.build401Resp())?.addListener(ChannelFutureListener.CLOSE)
@@ -43,11 +49,6 @@ object PapiReq : UniporterHttpHandler {
         // 获取验证 POST 参数
         if (!paramMap.containsKey("data")) {
             context.writeAndFlush(Utils.build400Resp())?.addListener(ChannelFutureListener.CLOSE)
-            return
-        }
-
-        if (!UniAuth.PapiEnabled) {
-            context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
 

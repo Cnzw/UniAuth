@@ -15,9 +15,15 @@ import io.netty.handler.codec.http.multipart.InterfaceHttpData
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.info
 import taboolib.common.util.sync
+import taboolib.module.lang.sendLang
 import java.net.InetSocketAddress
 
 object CmdReq : UniporterHttpHandler {
+    init {
+        if (UniAuth.config.getBoolean("login.cmd")) {
+            console().sendLang("console-api-cmd-enable")
+        }
+    }
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
         // 访问日志
         val inSocket: InetSocketAddress = context?.channel()?.remoteAddress() as InetSocketAddress

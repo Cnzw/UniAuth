@@ -42,7 +42,7 @@ object PlayerReq : UniporterHttpHandler {
         val player = getProxyPlayer(paramMap["name"]!![0])
         // 构建返回
         val optJson = if (player == null) {
-            val offlinePlayer = Bukkit.getOfflinePlayer(Utils.getOfflineUUID(paramMap["name"]!![0])) // TODO 正版服务器UUID获取
+            val offlinePlayer = Bukkit.getOfflinePlayer(Utils.getOfflineUUID(paramMap["name"]!![0]))
             if (!offlinePlayer.hasPlayedBefore()) {
                 context.writeAndFlush(Utils.build404Resp())?.addListener(ChannelFutureListener.CLOSE)
                 return
