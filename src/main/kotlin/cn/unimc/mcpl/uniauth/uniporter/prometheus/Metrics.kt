@@ -13,6 +13,7 @@ import io.prometheus.metrics.expositionformats.PrometheusTextFormatWriter
 import io.prometheus.metrics.model.registry.PrometheusRegistry
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.entity.Entity
 import taboolib.common.platform.function.console
 import taboolib.common.platform.function.pluginVersion
 import taboolib.module.lang.sendWarn
@@ -47,7 +48,7 @@ object Metrics : UniporterHttpHandler {
     val entities: Gauge = Gauge.builder()
         .name("entities")
         .help("Entities count")
-        .labelNames("world")
+        .labelNames("world", "type")
         .register()
 
     fun collectMetrics() {
@@ -56,10 +57,34 @@ object Metrics : UniporterHttpHandler {
         memory.labelValues("total").set(Runtime.getRuntime().totalMemory().toDouble() / 1048576)
         memory.labelValues("used").set((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()).toDouble() / 1048576)
 
+        val entityStrings = UniAuth.config.getStringList("prometheus.entities")
         for (world in Bukkit.getWorlds()) {
+            val allEntities = world.entities
+
+            if (entityStrings.isNotEmpty()) {
+                if (entityStrings.contains("all")) {
+                    val entitiesMap = allEntities.groupBy { it.type.name }
+                    for ((entityType, entitiesObj) in entitiesMap) {
+                        entities.labelValues(world.name, entityType.lowercase()).set(entitiesObj.size.toDouble())
+                    }
+                } else {
+                    for (entityString in entityStrings) {
+                        try {
+                            @Suppress("UNCHECKED_CAST")
+                            val cls = Class.forName("org.bukkit.entity.${entityString}") as Class<out Entity>
+                            val filteredEntities = allEntities.filter { it.javaClass == cls }
+                            entities.labelValues(world.name, entityString.lowercase()).set(filteredEntities.size.toDouble())
+                        } catch (e: ClassNotFoundException) {
+                            console().sendWarn("console-promotheus-entity-not-found", entityString)
+                            continue
+                        }
+                    }
+                }
+            }
+
+            entities.labelValues(world.name, "total").set(allEntities.size.toDouble())
             onlinePlayers.labelValues(world.name).set(world.players.size.toDouble())
             chunks.labelValues(world.name).set(world.loadedChunks.size.toDouble())
-            entities.labelValues(world.name).set(world.entities.size.toDouble())
         }
 
         if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {

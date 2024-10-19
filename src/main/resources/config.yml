@@ -1,8 +1,10 @@
 debug: false
+# bstate metrics
 metrics: true
 api:
   path: "uniauth"
   key: "123456"
+  cmd: false
 login:
   enable: false
   server-id: "uniauth"
@@ -14,8 +16,9 @@ login:
   session-timeout: 600
   # {0}=serverid {1}=code
   qrcode-url: "https://ua.unimc.cn/mp/login?server={1}&code={0}"
-  cmd: false
 prometheus:
   enable: false
   pushgateway: false
   pushgateway-url: "http://localhost:9091"
+  # "all"（所有实体）或实体类名（见 https://helpch.at/docs/1.12.2/org/bukkit/entity/package-summary.html 如 "Pig"）
+  entities: []
