@@ -5,16 +5,24 @@ console-api-key-default: "检测到 api.key 是默认密钥，已生成随机密
 console-papi-server: "PAPI 未加载 Server 扩展，不输出 TPS 信息"
 console-api-cmd-enable: "CMD 已启用，可通过 API 控制服务器命令行"
 console-api-cmd-err: "CMD 回显出错"
+console-api-cmd-exec: "{1} 执行指令 {0}" # {0}=命令 {1}=ip
 console-prometheus-pushgateway-enable: "Prometheus PushGateway 已启用，将定时推送服务器状态"
 console-promotheus-entity-not-found: "未找到 org.org.bukkit.entity.{0} 类，请检查配置文件"
 
 kick-req: "你被踢了"
-kick-login-timeout: "§c扫码超时，请重新登录"
-kick-scan-timeout: "§c确认超时，请重新扫码"
-kick-login-cancel: "§c登录取消"
+kick-login-timeout: "§c扫码超时，请重新登录" # {0}=玩家名
+kick-scan-timeout: "§c确认超时，请重新扫码" # {0}=玩家名
+kick-login-cancel: "§c登录取消" # {0}=玩家名
 
 player-login-session: "§a登录成功，欢迎回来" # {0}=玩家名
 player-login-prompt: "§a请使用手机QQ扫码" # {0}=玩家名
 player-login-success: "§a扫码成功" # {0}=玩家名
 player-scan-prompt: "§a请在手机上确认" # {0}=玩家名
 player-scan-success: "§a登录成功" # {0}=玩家名
+
+updater-checking: "正在检查插件更新..."
+updater-checked: "检查插件更新完成"
+updater-plugin-not-found: "{0} 插件未在本地安装"
+updater-update-available: "在 {1} 发现 {0}-{2} 的新版本 {3} {4}" # {0}插件名 {1}平台 {2}本地版本 {3}搜索版本 {4}url
+updater-update-latest: "{0} 是最新版本，无需更新" # {0}插件名 {1}平台 {2}版本 {3}url
+updater-update-notfound: "{0} 未找到对应插件" # {0}插件名

@@ -22,3 +22,6 @@ prometheus:
   pushgateway-url: "http://localhost:9091"
   # "all"（所有实体）或实体类名（见 https://helpch.at/docs/1.12.2/org/bukkit/entity/package-summary.html 如 "Pig"）
   entities: []
+updater:
+  # 最后不带/
+  url: "https://pluginportal.unimc.cn"

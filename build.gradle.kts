@@ -62,6 +62,7 @@ dependencies {
     taboo("io.prometheus:prometheus-metrics-core:1.3.1")
     taboo("io.prometheus:prometheus-metrics-exposition-formats:1.3.1")
     taboo("io.prometheus:prometheus-metrics-exporter-pushgateway:1.3.1")
+    taboo("com.squareup.okhttp3:okhttp:4.12.0")
     compileOnly(kotlin("stdlib"))
     compileOnly(fileTree("libs"))
 }
