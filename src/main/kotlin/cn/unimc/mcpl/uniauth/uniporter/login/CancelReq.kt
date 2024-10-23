@@ -58,7 +58,7 @@ object CancelReq : UniporterHttpHandler {
         val player = Bukkit.getPlayer(name)
         // 监听器里已经写了Fail代码
         // PlayerAuthStateUtils.setStateFail(name)
-        sync { player.kickPlayer(console().asLangText("kick-login-cancel")) }
+        sync { player.kickPlayer(Utils.getLangText("kick-login-cancel", name)) }
 
         UniAuthCancelEvent(player, paramMap["code"]!![0].toInt()).call()
 

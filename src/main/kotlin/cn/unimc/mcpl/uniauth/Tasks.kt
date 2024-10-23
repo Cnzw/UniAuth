@@ -21,9 +21,9 @@ object Tasks {
             val tPlayer = PlayerAuthStateUtils.getAuthTimeoutPlayers()
             tPlayer.forEach {
                 if (it.state == AuthState.SCAN) {
-                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-scan-timeout", it.name))
+                    getProxyPlayer(it.name)?.kick(Utils.getLangText("kick-scan-timeout", it.name))
                 } else {
-                    getProxyPlayer(it.name)?.kick(console().asLangText("kick-login-timeout", it.name))
+                    getProxyPlayer(it.name)?.kick(Utils.getLangText("kick-login-timeout", it.name))
                 }
                 PlayerAuthStateUtils.setStateFail(it.name)
             }
@@ -53,7 +53,7 @@ object Tasks {
             return
         }
 
-        console().sendLang("console-prometheus-pushgateway-enable")
+        Utils.infoLog("console-prometheus-pushgateway-enable")
 
         val url = URI(UniAuth.config.getString("prometheus.pushgateway-url")!!)
         val pushGateway = PushGateway.builder()

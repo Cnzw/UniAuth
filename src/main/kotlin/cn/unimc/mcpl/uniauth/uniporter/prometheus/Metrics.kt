@@ -75,7 +75,7 @@ object Metrics : UniporterHttpHandler {
                             val filteredEntities = allEntities.filter { it.javaClass == cls }
                             entities.labelValues(world.name, entityString.lowercase()).set(filteredEntities.size.toDouble())
                         } catch (e: ClassNotFoundException) {
-                            console().sendWarn("console-promotheus-entity-not-found", entityString)
+                            Utils.warnLog("console-promotheus-entity-not-found", entityString)
                             continue
                         }
                     }
@@ -90,7 +90,6 @@ object Metrics : UniporterHttpHandler {
         if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
             tps.set(PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble())
         } else {
-            console().sendWarn("console-papi-not-load")
             tps.set(20.0)
         }
     }

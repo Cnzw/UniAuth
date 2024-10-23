@@ -36,7 +36,6 @@ object ServerReq : UniporterHttpHandler {
         val tps: Double? = if (UniAuth.PapiEnabled && PlaceholderAPI.isRegistered("server")) {
             PlaceholderAPI.setPlaceholders(null, "%server_tps_1%").replace("*", "").toDouble()
         } else {
-            console().sendWarn("console-papi-not-load")
             null
         }
         // 构建返回

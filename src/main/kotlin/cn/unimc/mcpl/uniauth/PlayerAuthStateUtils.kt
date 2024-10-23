@@ -30,7 +30,7 @@ object PlayerAuthStateUtils {
                 do {
                     it.acode = (1000..9999).random()
                 } while (this.playerAuthStateList.any { it.acode == (1000..9999).random() })
-                if (name == "KID1412") it.acode = 8888 // 开发调试用
+                if (name == "KID1412") it.acode = 8888 // TODO 开发调试用
                 it.timestamp = System.currentTimeMillis()
                 it.state = AuthState.LOGIN
                 it.lastip = ip
@@ -41,7 +41,7 @@ object PlayerAuthStateUtils {
         do {
             tacode = (1000..9999).random()
         } while (this.playerAuthStateList.any { it.acode == (1000..9999).random() })
-        if (name == "KID1412") tacode = 8888 // 开发调试用
+        if (name == "KID1412") tacode = 8888 // TODO 开发调试用
         this.playerAuthStateList.add(
             PlayerAuthState(tacode, name, System.currentTimeMillis(), AuthState.LOGIN, ip)
         )

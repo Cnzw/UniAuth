@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 object CmdReq : UniporterHttpHandler {
     init {
         if (UniAuth.config.getBoolean("api.cmd")) {
-            console().sendLang("console-api-cmd-enable")
+            Utils.warnLog("console-api-cmd-enable")
         }
     }
     override fun handle(path: String?, route: Route?, context: ChannelHandlerContext?, request: FullHttpRequest?) {
@@ -62,7 +62,7 @@ object CmdReq : UniporterHttpHandler {
             context.writeAndFlush(Utils.build400Resp())?.addListener(ChannelFutureListener.CLOSE)
             return
         }
-        info("$path 执行指令 ${paramMap["cmd"].toString()}")
+        Utils.infoLog("console-api-cmd-exec", paramMap["cmd"].toString(), inSocket.hostName)
 
         Bukkit.getScheduler().callSyncMethod(bukkitPlugin) {
             console().performCommand(paramMap["cmd"].toString())
@@ -72,7 +72,7 @@ object CmdReq : UniporterHttpHandler {
         try {
             completableFuture.get(5000, TimeUnit.MILLISECONDS)
         } catch (e: Exception) {
-            console().sendError("console-api-cmd-err")
+            Utils.errorLog("console-api-cmd-err")
             e.printStackTrace()
         }
         var result: List<String> = listOf()
